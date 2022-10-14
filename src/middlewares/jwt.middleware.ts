@@ -16,7 +16,7 @@ export class JwtMiddleWare implements NestMiddleware<Request, Response> {
     const [type, value] = authorization.split(' ');
     if (type !== 'Bearer' || !value) throw new UnauthorizedException();
 
-    // TODO: jwt 로직 전체를 gaurd로 변경하고 미들웨어를 삭제하거나, 현재로직을 변경할 예정
+    // FIXME: jwt 로직 전체를 gaurd로 변경하고 미들웨어를 삭제하거나, 현재로직을 변경할 예정
     // const userid = this.jwtService.verify(value, {
     //   secret: process.env.JWT_SECRET,
     // });
