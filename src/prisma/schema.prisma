@@ -11,27 +11,27 @@ model Customer {
   id       Int     @id @default(autoincrement())
   email    String  @unique
   password String?
-  nickname String
   age      Int?
   activity String?
   gender   String?
   provider String
+  nickname String
   Like     Like[]
 }
 
 model Pharmacist {
-  id                  Int    @id @default(autoincrement())
-  email               String   @unique
+  id                  Int     @id @default(autoincrement())
+  email               String  @unique
   password            String
-  userName            String
   pharmacyName        String
   pharmacyAddress     String
   counselingStartTime String?
   counselingEndTime   String?
-  Post                Post[]
+  userName            String
+  Posting                Posting[]
 }
 
-model Post {
+model Posting {
   id           Int        @id @default(autoincrement())
   title        String
   content      String
@@ -43,7 +43,8 @@ model Post {
 model Like {
   postId     Int
   customerId Int
-  post       Post     @relation(fields: [postId], references: [id])
   customer   Customer @relation(fields: [customerId], references: [id])
-  @@id([postId,customerId])
+  posting       Posting     @relation(fields: [postId], references: [id])
+
+  @@id([postId, customerId])
 }
