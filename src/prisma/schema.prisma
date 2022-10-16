@@ -9,9 +9,9 @@ datasource db {
 
 model Customer {
   id       Int     @id @default(autoincrement())
-  email    String
+  email    String  @unique
   password String?
-  nickName String
+  nickname String
   age      Int?
   activity String?
   gender   String?
@@ -20,10 +20,10 @@ model Customer {
 }
 
 model Pharmacist {
-  id                  Int     @id @default(autoincrement())
-  email               String
+  id                  Int    @id @default(autoincrement())
+  email               String   @unique
   password            String
-  nickName            String
+  userName            String
   pharmacyName        String
   pharmacyAddress     String
   counselingStartTime String?
@@ -43,8 +43,7 @@ model Post {
 model Like {
   postId     Int
   customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id])
   post       Post     @relation(fields: [postId], references: [id])
-
-  @@id([postId, customerId])
+  customer   Customer @relation(fields: [customerId], references: [id])
+  @@id([postId,customerId])
 }
