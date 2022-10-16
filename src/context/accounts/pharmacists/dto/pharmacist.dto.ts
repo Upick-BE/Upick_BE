@@ -1,7 +1,7 @@
 export interface Pharmacist {
   email: string;
   password: string;
-  nickName: string;
+  userName: string;
   pharmacyName: string;
   pharmacyAddress: string;
   counselingStartTime?: string;
