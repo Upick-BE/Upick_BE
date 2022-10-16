@@ -9,7 +9,41 @@ datasource db {
 
 model Customer {
   id       Int     @id @default(autoincrement())
-  email String
-  username String
+  email    String
   password String?
+  nickName String
+  age      Int?
+  activity String?
+  gender   String?
+  provider String
+  Like     Like[]
+}
+
+model Pharmacist {
+  id                  Int    @id @default(autoincrement())
+  email               String
+  password            String
+  nickName            String
+  pharmacyName        String
+  pharmacyAddress     String
+  counselingStartTime String
+  counselingEndTime   String
+  Post                Post[]
+}
+
+model Post {
+  id           Int        @id @default(autoincrement())
+  title        String
+  content      String
+  pharmacistId Int
+  pharmacist   Pharmacist @relation(fields: [pharmacistId], references: [id])
+  Like         Like[]
+}
+
+model Like {
+  postId     Int
+  customerId Int
+  post       Post     @relation(fields: [postId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id])
+  @@id([postId,customerId])
 }
