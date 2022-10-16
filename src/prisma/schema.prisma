@@ -26,8 +26,8 @@ model Pharmacist {
   nickName            String
   pharmacyName        String
   pharmacyAddress     String
-  counselingStartTime String
-  counselingEndTime   String
+  counselingStartTime String?
+  counselingEndTime   String?
   Post                Post[]
 }
 
