@@ -20,7 +20,7 @@ model Customer {
 }
 
 model Pharmacist {
-  id                  Int    @id @default(autoincrement())
+  id                  Int     @id @default(autoincrement())
   email               String
   password            String
   nickName            String
@@ -43,7 +43,8 @@ model Post {
 model Like {
   postId     Int
   customerId Int
-  post       Post     @relation(fields: [postId], references: [id])
   customer   Customer @relation(fields: [customerId], references: [id])
-  @@id([postId,customerId])
+  post       Post     @relation(fields: [postId], references: [id])
+
+  @@id([postId, customerId])
 }
