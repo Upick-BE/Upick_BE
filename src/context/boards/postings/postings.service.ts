@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { userInfo } from 'os';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Posting } from './dto/postings.dto';
 
@@ -23,13 +24,46 @@ export class PostingsService {
     const posting = await this.prismaService.posting.findUnique({
       //TODO: prisma crud 읽어보기
       where: { id },
+      include: {
+        pharmacist: {
+          select: { userName: true, pharmacyName: true, pharmacyAddress: true },
+        },
+      },
     });
 
     return { result: posting, message: `${id}번 칼럼 조회 완료` };
   }
-  
-  async getPostings(){
-    const postings = await this.prismaService.posting.findMany()
-    return {result: postings, message: "모든 칼럼 조회 완료"}
+
+  async getPostings() {
+    const postings = await this.prismaService.posting.findMany({
+      include: {
+        pharmacist: {
+          select: { userName: true, pharmacyName: true, pharmacyAddress: true },
+        },
+      },
+    });
+    return { result: postings, message: '모든 칼럼 조회 완료' };
+  }
+
+  async updatePosting(id:number,posting:Posting) {
+    const{title,content} = posting
+    const updatedPosting = await this.prismaService.posting.update({
+      where : {
+        id
+      },
+      include: {
+        pharmacist: {
+          select: { userName: true, pharmacyName: true, pharmacyAddress: true },
+        },
+      },
+      data : {
+        title,content
+      }
+    })
+    if(!updatedPosting){
+      throw new InternalServerErrorException();
+    }
+
+    return {result:updatedPosting, message:'칼럼이 수정되었습니다' }
   }
 }
