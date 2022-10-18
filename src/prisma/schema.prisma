@@ -8,43 +8,51 @@ datasource db {
 }
 
 model Customer {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String?
-  age      Int?
-  activity String?
-  gender   String?
-  provider String
-  nickname String
-  Like     Like[]
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  password     String?
+  age          Int?
+  activity     String?
+  gender       String?
+  provider     String
+  nickname     String
+  postingLikes PostingLikes[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
 model Pharmacist {
-  id                  Int     @id @default(autoincrement())
-  email               String  @unique
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique
   password            String
   pharmacyName        String
   pharmacyAddress     String
   counselingStartTime String?
   counselingEndTime   String?
   userName            String
-  Posting                Posting[]
+  Posting             Posting[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 model Posting {
-  id           Int        @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   title        String
   content      String
   pharmacistId Int
-  pharmacist   Pharmacist @relation(fields: [pharmacistId], references: [id])
-  Like         Like[]
+  pharmacist   Pharmacist     @relation(fields: [pharmacistId], references: [id])
+  postingLikes PostingLikes[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
-model Like {
-  postId     Int
+model PostingLikes {
+  postingId  Int
   customerId Int
   customer   Customer @relation(fields: [customerId], references: [id])
-  posting       Posting     @relation(fields: [postId], references: [id])
+  posting    Posting  @relation(fields: [postingId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@id([postId, customerId])
+  @@id([postingId, customerId])
 }
