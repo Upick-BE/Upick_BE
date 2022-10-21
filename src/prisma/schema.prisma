@@ -16,23 +16,23 @@ model Customer {
   gender       String?
   provider     String
   nickname     String
-  postingLikes PostingLikes[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  postingLikes PostingLikes[]
 }
 
 model Pharmacist {
   id                  Int       @id @default(autoincrement())
   email               String    @unique
-  password            String
+  password            String?
   pharmacyName        String
   pharmacyAddress     String
   counselingStartTime String?
   counselingEndTime   String?
   userName            String
-  Posting             Posting[]
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+  Posting             Posting[]
 }
 
 model Posting {
@@ -40,19 +40,19 @@ model Posting {
   title        String
   content      String
   pharmacistId Int
-  pharmacist   Pharmacist     @relation(fields: [pharmacistId], references: [id])
-  postingLikes PostingLikes[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  pharmacist   Pharmacist     @relation(fields: [pharmacistId], references: [id])
+  postingLikes PostingLikes[]
 }
 
 model PostingLikes {
   postingId  Int
   customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id])
-  posting    Posting  @relation(fields: [postingId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  customer   Customer @relation(fields: [customerId], references: [id])
+  posting    Posting  @relation(fields: [postingId], references: [id])
 
   @@id([postingId, customerId])
 }

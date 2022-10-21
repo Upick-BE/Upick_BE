@@ -1,4 +1,4 @@
-export interface Pharmacist {
+export interface PharmacistSignUpDto {
   email: string;
   password: string;
   userName: string;
@@ -6,4 +6,5 @@ export interface Pharmacist {
   pharmacyAddress: string;
   counselingStartTime?: string;
   counselingEndTime?: string;
+  pharmacistSignUpSecret: string;
 }

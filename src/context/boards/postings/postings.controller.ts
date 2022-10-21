@@ -10,14 +10,22 @@ import {
 } from '@nestjs/common';
 import { PostingsService } from './postings.service';
 import { Posting } from './dto/postings.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { ROLE } from 'src/constant/account.constant';
+import { Pharmacist } from 'src/decorators/pharmacist.decorator';
+import { Pharmacist as TPharmacist } from '@prisma/client';
 
 @Controller('posting')
 export class PostingsController {
   constructor(private readonly postingsService: PostingsService) {}
 
   @Post('')
-  createPosting(@Body() posting: Posting) {
-    return this.postingsService.createPosting(posting);
+  @Roles(ROLE.PHARMACIST) // 가드의 역할: 토큰을 해독해 pharmacist인지 customer인지 확인
+  createPosting(
+    @Body() posting: Posting,
+    @Pharmacist() pharmacist: TPharmacist, // 데코레이터의 역할: 토큰을 해독해 토큰값에 해당하는 pharmacist (혹은 customer)를 가져옴
+  ) {
+    return this.postingsService.createPosting(posting, pharmacist);
   }
 
   @Get(':id')
@@ -31,11 +39,13 @@ export class PostingsController {
   }
 
   @Patch(':id')
+  @Roles(ROLE.PHARMACIST)
   updatePosting(
     @Param('id', ParseIntPipe) id: number,
     @Body() posting: Posting,
+    @Pharmacist() pharmacist: TPharmacist,
   ) {
-    return this.postingsService.updatePosting(id, posting);
+    return this.postingsService.updatePosting(id, posting, pharmacist);
   }
 
   @Put(':id/like') //FIXME: Body값을 customer로 수정
@@ -43,6 +53,6 @@ export class PostingsController {
     @Param('id', ParseIntPipe) id: number,
     @Body('customerId') customerId: number,
   ) {
-    return this.postingsService.toggleLike(id,customerId)
+    return this.postingsService.toggleLike(id, customerId);
   }
 }

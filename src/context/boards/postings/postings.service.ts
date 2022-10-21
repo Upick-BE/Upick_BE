@@ -1,5 +1,5 @@
+import { Pharmacist } from '@prisma/client';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { userInfo } from 'os';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Posting } from './dto/postings.dto';
 
@@ -7,14 +7,14 @@ import { Posting } from './dto/postings.dto';
 export class PostingsService {
   constructor(private prismaService: PrismaService) {}
 
-  async createPosting(posting: Posting) {
+  async createPosting(posting: Posting, pharmacist: Pharmacist) {
     const { title, content } = posting;
 
     if (!title.length || !content.length)
       throw new InternalServerErrorException();
 
     const createdPosting = await this.prismaService.posting.create({
-      data: { title, content, pharmacistId: 7 }, //FIXME: 작성자 아이디로 바꿀것!
+      data: { title, content, pharmacistId: pharmacist.id }, //FIXME: 작성자 아이디로 바꿀것!
     });
 
     return { result: createdPosting, message: '칼럼작성 완료!' };
@@ -45,32 +45,32 @@ export class PostingsService {
     return { result: postings, message: '모든 칼럼 조회 완료' };
   }
 
-  async updatePosting(id: number, posting: Posting) {
+  async updatePosting(id: number, posting: Posting, pharmacist: Pharmacist) {
     const { title, content } = posting;
+
+    const _posting = await this.prismaService.posting.findFirst({
+      where: { id, pharmacistId: pharmacist.id },
+    });
+
     const updatedPosting = await this.prismaService.posting.update({
-      where: {
-        id,
+      where: { id: _posting.id },
+      data: {
+        title,
+        content,
       },
       include: {
         pharmacist: {
           select: { userName: true, pharmacyName: true, pharmacyAddress: true },
         },
       },
-      data: {
-        title,
-        content,
-      },
     });
-    if (!updatedPosting) {
-      throw new InternalServerErrorException();
-    }
 
     return { result: updatedPosting, message: '칼럼이 수정되었습니다' };
   }
 
   async toggleLike(id: number, customerId: number) {
     const postingId = id;
-    let like = await this.prismaService.postingLikes.findUnique({
+    const like = await this.prismaService.postingLikes.findUnique({
       where: { postingId_customerId: { customerId, postingId } },
     });
 
