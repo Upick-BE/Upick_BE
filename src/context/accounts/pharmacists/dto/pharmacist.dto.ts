@@ -1,3 +1,4 @@
+
 export interface PharmacistSignUpDto {
   email: string;
   password: string;
@@ -7,4 +8,10 @@ export interface PharmacistSignUpDto {
   counselingStartTime?: string;
   counselingEndTime?: string;
   pharmacistSignUpSecret: string;
+}
+
+
+export interface SignInDto {
+  email: string;
+  password: string;
 }

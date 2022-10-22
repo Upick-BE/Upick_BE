@@ -1,14 +1,11 @@
 import { ROLE } from 'src/constant/account.constant';
-//import { Pharmacist } from './../../../decorators/pharmacist.decorator';
-
-//import { Payload } from './../../../guard/jwt.payload';
 import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PharmacistSignUpDto } from './dto/pharmacist.dto';
+import { PharmacistSignUpDto,SignInDto } from './dto/pharmacist.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload, sign } from 'jsonwebtoken';
 
@@ -29,7 +26,7 @@ export class PharmacistsService {
     );
 
     if (pharmacistSignUpSecret !== process.env.PHARMACIST_SIGNUP_SECRET)
-      throw new BadRequestException('여기지롱');
+      throw new BadRequestException('');
 
     const isExist = await this.prismaService.pharmacist.findFirst({
       where: { email },
@@ -55,7 +52,8 @@ export class PharmacistsService {
     return { result: _pharmacist, message: '회원가입 완료' };
   }
 
-  async signIn(email: string, password: string) {
+  async signIn(signInDto: SignInDto) {
+    const {email, password} = signInDto
     const pharmacist = await this.prismaService.pharmacist.findUnique({
       where: { email },
     });

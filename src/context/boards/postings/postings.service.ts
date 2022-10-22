@@ -14,7 +14,7 @@ export class PostingsService {
       throw new InternalServerErrorException();
 
     const createdPosting = await this.prismaService.posting.create({
-      data: { title, content, pharmacistId: pharmacist.id }, //FIXME: 작성자 아이디로 바꿀것!
+      data: { title, content, pharmacistId: pharmacist.id }, 
     });
 
     return { result: createdPosting, message: '칼럼작성 완료!' };

@@ -1,6 +1,5 @@
-import { Request } from 'express';
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { PharmacistSignUpDto } from './dto/pharmacist.dto';
+import { Body, Controller, Post } from '@nestjs/common';
+import { PharmacistSignUpDto, SignInDto } from './dto/pharmacist.dto';
 import { PharmacistsService } from './pharmacists.service';
 @Controller('pharmacists')
 export class PharmacistsController {
@@ -12,10 +11,8 @@ export class PharmacistsController {
   }
 
   @Post('sign-in')
-  signIn(@Req() request: Request) {
-    const { email, password } = request.body;
-
-    return this.pharmacistsService.signIn(email, password);
+  signIn(@Body() signInDto : SignInDto) {
+    return this.pharmacistsService.signIn(signInDto);
   }
 }
 

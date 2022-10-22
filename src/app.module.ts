@@ -8,11 +8,11 @@ import { AccountsModule } from './context/accounts/accounts.module';
 import { BoardsModule } from './context/boards/boards.module';
 import { RolesGuard } from './guard/role.guard';
 import { InjectAccountMiddleware } from './middlewares/injectAccount.middleware';
-import { Auth } from './auth';
+
 @Module({
   imports: [PrismaModule, GoodsModule, AccountsModule, BoardsModule,],
   controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: RolesGuard }, Auth],
+  providers: [AppService, { provide: APP_GUARD, useClass: RolesGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
