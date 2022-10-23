@@ -70,7 +70,6 @@ export class PharmacistsService {
     const payload: JwtPayload = {
       sub: pharmacist.email,
       role: ROLE.PHARMACIST,
-      username: pharmacist.userName,
     };
 
     const secret = process.env.PHARMACIST_JWT_SECRET;

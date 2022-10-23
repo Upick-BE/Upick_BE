@@ -9,16 +9,24 @@ datasource db {
 
 model Customer {
   id           Int            @id @default(autoincrement())
-  email        String         @unique
+  email        String?        @unique
   password     String?
   age          Int?
   activity     String?
   gender       String?
-  provider     String
-  nickname     String
+  provider     Provider
+  providerId   String?
+  nickname     String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   postingLikes PostingLikes[]
+
+  @@unique([provider, providerId])
+}
+
+enum Provider {
+  local
+  kakao
 }
 
 model Pharmacist {
@@ -44,6 +52,25 @@ model Posting {
   updatedAt    DateTime       @updatedAt
   pharmacist   Pharmacist     @relation(fields: [pharmacistId], references: [id])
   postingLikes PostingLikes[]
+  PostingToTag PostingToTag[]
+}
+
+model Tag {
+  id           Int            @id @default(autoincrement())
+  tagName      String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  PostingToTag PostingToTag[]
+}
+
+model PostingToTag {
+  id        Int      @id @default(autoincrement())
+  tagId     Int
+  postingId Int
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  posting   Posting  @relation(fields: [postingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PostingLikes {

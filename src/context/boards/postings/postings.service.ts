@@ -8,16 +8,42 @@ export class PostingsService {
   constructor(private prismaService: PrismaService) {}
 
   async createPosting(posting: Posting, pharmacist: Pharmacist) {
-    const { title, content } = posting;
+    const { title, content, tags } = posting;
 
     if (!title.length || !content.length)
       throw new InternalServerErrorException();
 
     const createdPosting = await this.prismaService.posting.create({
-      data: { title, content, pharmacistId: pharmacist.id }, 
+      data: { title, content, pharmacistId: pharmacist.id },
     });
 
-    return { result: createdPosting, message: '칼럼작성 완료!' };
+    if (tags.length) {
+      for (const tagname of tags) {
+        let tag = await this.prismaService.tag.findFirst({
+          where: { tagName: tagname },
+        });
+
+        if (!tag) {
+          tag = await this.prismaService.tag.create({
+            data: {
+              tagName: tagname,
+            },
+          });
+        }
+        await this.prismaService.postingToTag.create({
+          data: { postingId: createdPosting.id, tagId: tag.id },
+        });
+      }
+    }
+
+    const _posting = await this.prismaService.posting.findUnique({
+      where: { id: createdPosting.id },
+      include: {
+        PostingToTag: { select: { tag: { select: { tagName: true } } } },
+      },
+    });
+
+    return { result: _posting, message: '칼럼작성 완료!' };
   }
 
   async getPosting(id: number) {
