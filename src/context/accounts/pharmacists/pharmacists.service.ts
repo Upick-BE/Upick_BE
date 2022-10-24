@@ -75,7 +75,6 @@ export class PharmacistsService {
     const secret = process.env.PHARMACIST_JWT_SECRET;
     const expiresIn = '3h';
     const token = sign(payload, secret, { expiresIn });
-
     return { result: token, message: 'Login success' };
   }
 }
