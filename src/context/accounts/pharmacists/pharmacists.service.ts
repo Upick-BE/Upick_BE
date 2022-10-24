@@ -76,6 +76,7 @@ export class PharmacistsService {
     const expiresIn = '3h';
     const token = sign(payload, secret, { expiresIn });
     
+    
     return { result: token, message: 'Login success' };
   }
 }
