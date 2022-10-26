@@ -1,27 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateMerchandiseDto } from './dto/merchandise.dto';
 
 @Injectable()
 export class MerchandisesService {
   constructor(private prismaService: PrismaService) {}
 
-  //   async createMerchandise(createMerchandiseDto: CreateMerchandiseDto) {
-  //     const { name, companyId, certification, imageUrl, merchandiseEffects } =
-  //       createMerchandiseDto;
+  async createMerchandise(
+    merchandiseCreateWithoutImageInput: Prisma.MerchandiseCreateWithoutImageInput,
+    imageToUpload: Express.Multer.File,
+  ) {
+    //FIXME: 이미지 생성 로직
+    const merchandise = await this.prismaService.merchandise.create({
+      data: { ...merchandiseCreateWithoutImageInput },
+    });
 
-  //     const createTagsArg = merchandiseEffects.map((effect) => {
-  //       return { name: effect };
-  //     });
-  //     await this.prismaService.tag.createMany({ data: createTagsArg });
-
-  //     const merchandise = await this.prismaService.merchandise.create({
-  //       data: {
-  //         name,
-  //         companyId,
-  //         certification,
-  //         MerchandiseEffect: { createMany: { data: [{}] } },
-  //       },
-  //     });
-  //   }
+    return { result: merchandise, message: '상품 생성 완료' };
+  }
 }

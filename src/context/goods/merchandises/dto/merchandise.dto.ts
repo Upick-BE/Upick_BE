@@ -1,7 +1,8 @@
 export interface CreateMerchandiseDto {
-  companyId: number;
+  company: string;
+  rating: string;
   name: string;
-  certification: boolean;
-  imageUrl: string;
-  merchandiseEffects: string[];
+  certification: string;
+  imageToUpload: Express.Multer.File[];
+  merchandiseHowToConsume: string;
 }

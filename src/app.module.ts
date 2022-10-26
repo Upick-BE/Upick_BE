@@ -8,9 +8,16 @@ import { AccountsModule } from './context/accounts/accounts.module';
 import { BoardsModule } from './context/boards/boards.module';
 import { RolesGuard } from './guard/role.guard';
 import { InjectAccountMiddleware } from './middlewares/injectAccount.middleware';
+import { CommonModule } from './context/common/common.module';
 
 @Module({
-  imports: [PrismaModule, GoodsModule, AccountsModule, BoardsModule,],
+  imports: [
+    PrismaModule,
+    GoodsModule,
+    AccountsModule,
+    BoardsModule,
+    CommonModule,
+  ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: RolesGuard }],
 })
