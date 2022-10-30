@@ -112,4 +112,9 @@ export class MerchandisesController {
       pharmacist,
     );
   }
+
+  @Get(':merchandiseId')
+  getMerchandise(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
+    return this.merchandisesService.getMerchandise(merchandiseId);
+  }
 }

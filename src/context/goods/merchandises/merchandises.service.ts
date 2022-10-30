@@ -198,4 +198,22 @@ export class MerchandisesService {
 
     return { result: deletedComment, message: '댓글 삭제 완료' };
   }
+
+  async getMerchandise(merchandiseId: number) {
+    const merchandise = await this.prismaService.merchandise.findUnique({
+      where: { id: merchandiseId },
+      include: {
+        Comment: true,
+        company: true,
+        Image: { select: { url: true } },
+        MerchandiseEffect: { select: { tag: { select: { name: true } } } },
+        merchandiseHowToConsume: { select: { consumption: true } },
+        MerchandiseLikes: {
+          select: { customer: { select: { _count: true } } },
+        },
+      },
+    });
+
+    return { result: merchandise, message: '약 상세조회 완료' };
+  }
 }
