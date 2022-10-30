@@ -6,6 +6,9 @@ import {
   UseInterceptors,
   Param,
   ParseIntPipe,
+  Get,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Pharmacist as TPharmacist, Prisma } from '@prisma/client';
@@ -14,7 +17,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { TransformMerchandisesCreateMerchandiseRequestDtoPipe } from './merchandises.pipe';
 import { MerchandisesService } from './merchandises.service';
 import {
-  CreateCommentDto,
+  Comment,
+  PatchCommentDto,
   CreateMerchandiseFromCrawlerDto,
 } from './dto/merchandise.dto';
 import { Pharmacist } from 'src/decorators/pharmacist.decorator';
@@ -60,16 +64,51 @@ export class MerchandisesController {
     );
   }
 
-  @Post('/:merchandiseId/comment')
+  @Post('/:merchandiseId/comments')
   @Roles(ROLE.PHARMACIST)
   createComment(
-    @Body() createCommentDto: CreateCommentDto,
+    @Body() createCommentDto: Comment,
     @Pharmacist() pharmacist: TPharmacist,
     @Param('merchandiseId', ParseIntPipe) merchandiseId: number,
   ) {
     return this.merchandisesService.createComment(
       merchandiseId,
       createCommentDto,
+      pharmacist,
+    );
+  }
+
+  // @Get('/:merchandiseId/comments')
+  // getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
+  //   return this.merchandisesService.getComments(merchandiseId);
+  // }
+
+  @Patch('/:merchandiseId/comments/:commentId')
+  @Roles(ROLE.PHARMACIST)
+  patchComment(
+    @Body() patchCommentDto: PatchCommentDto,
+    @Pharmacist() pharmacist: TPharmacist,
+    @Param('merchandiseId', ParseIntPipe) merchandiseId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ) {
+    return this.merchandisesService.patchComment(
+      merchandiseId,
+      commentId,
+      patchCommentDto,
+      pharmacist,
+    );
+  }
+
+  @Delete('/:merchandiseId/comments/:commentId')
+  @Roles(ROLE.PHARMACIST)
+  deleteComment(
+    @Pharmacist() pharmacist: TPharmacist,
+    @Param('merchandiseId', ParseIntPipe) merchandiseId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ) {
+    return this.merchandisesService.deleteComment(
+      merchandiseId,
+      commentId,
       pharmacist,
     );
   }

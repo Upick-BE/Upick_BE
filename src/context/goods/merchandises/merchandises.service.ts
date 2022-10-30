@@ -1,9 +1,15 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Pharmacist, Prisma } from '@prisma/client';
 import { ImagesService } from 'src/context/common/images/images.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
-  CreateCommentDto,
+  Comment,
+  PatchCommentDto,
   CreateMerchandiseFromCrawlerDto,
 } from './dto/merchandise.dto';
 
@@ -114,14 +120,12 @@ export class MerchandisesService {
 
   async createComment(
     merchandiseId: number,
-    createComentDto: CreateCommentDto,
+    createComentDto: Comment,
     Pharmacist: Pharmacist,
   ) {
     const { positive, negative, rating } = createComentDto;
-
     if (!positive || !negative || !rating)
       throw new InternalServerErrorException();
-
     const comment = await this.prismaService.comment.create({
       data: {
         merchandiseId,
@@ -133,5 +137,65 @@ export class MerchandisesService {
     });
 
     return { result: comment, message: '댓글 작성 완료' };
+  }
+
+  // async getComments(merchandiseId: number) {
+  //   const comment = await this.prismaService.comment.findMany({
+  //     where: { merchandiseId },
+  //     include: {
+  //       Pharmacist: {
+  //         select: { userName: true },
+  //       },
+  //     },
+  //   });
+
+  //   return { result: comment, message: `${merchandiseId}번 약 댓글 조회 완료` };
+  // }
+
+  async patchComment(
+    merchandiseId: number,
+    commentId: number,
+    patchCommentDto: PatchCommentDto,
+    Pharmacist: Pharmacist,
+  ) {
+    const comment = await this.prismaService.comment.findUniqueOrThrow({
+      where: { id: commentId },
+    });
+    if (comment.pharmacistId !== Pharmacist.id)
+      throw new UnauthorizedException();
+    if (comment.merchandiseId !== merchandiseId)
+      throw new BadRequestException();
+
+    const patchedComment = await this.prismaService.comment.update({
+      where: { id: comment.id },
+      data: patchCommentDto,
+      include: {
+        Pharmacist: {
+          select: { userName: true },
+        },
+      },
+    });
+
+    return { result: patchedComment, message: '댓글 수정 완료' };
+  }
+
+  async deleteComment(
+    merchandiseId: number,
+    commentId: number,
+    Pharmacist: Pharmacist,
+  ) {
+    const comment = await this.prismaService.comment.findUniqueOrThrow({
+      where: { id: commentId },
+    });
+    if (comment.pharmacistId !== Pharmacist.id)
+      throw new UnauthorizedException();
+    if (comment.merchandiseId !== merchandiseId)
+      throw new BadRequestException();
+
+    const deletedComment = await this.prismaService.comment.delete({
+      where: { id: comment.id },
+    });
+
+    return { result: deletedComment, message: '댓글 삭제 완료' };
   }
 }

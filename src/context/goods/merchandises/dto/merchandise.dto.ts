@@ -1,3 +1,5 @@
+//import { Merchandise } from '@prisma/client';
+//import { CreateComentDto } from './../../../../../dist/context/boards/coments/dto/coments.dto.d';
 export interface CreateMerchandiseDto {
   company: string;
   rating: string;
@@ -7,10 +9,19 @@ export interface CreateMerchandiseDto {
   merchandiseHowToConsume: string;
 }
 
-export interface CreateCommentDto {
+export interface Comment {
   positive: string;
   negative: string;
   rating: number;
+}
+export interface PatchCommentDto {
+  positive: string;
+  negative: string;
+  rating: number;
+}
+
+export interface CreateComentDto extends Comment {
+  merchandiseId: number;
 }
 
 export interface CreateMerchandiseFromCrawlerDto {
