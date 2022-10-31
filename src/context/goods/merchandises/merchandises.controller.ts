@@ -9,6 +9,7 @@ import {
   Get,
   Patch,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Pharmacist as TPharmacist, Prisma } from '@prisma/client';
@@ -117,4 +118,13 @@ export class MerchandisesController {
   getMerchandise(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
     return this.merchandisesService.getMerchandise(merchandiseId);
   }
+
+  @Put(':id/like')
+  toggleLike(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('customerId') customerId: number,
+  ) {
+    return this.merchandisesService.toggleLike(id, customerId);
+  }
+
 }

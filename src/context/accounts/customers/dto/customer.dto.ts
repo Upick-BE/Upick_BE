@@ -2,6 +2,9 @@ export interface Customer {
   email: string;
   password: string;
   nickname: string;
+  age : number;
+  gender : string;
+  
 }
 
 export interface SignInDto {

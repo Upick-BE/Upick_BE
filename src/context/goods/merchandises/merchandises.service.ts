@@ -216,4 +216,23 @@ export class MerchandisesService {
 
     return { result: merchandise, message: '약 상세조회 완료' };
   }
+
+  async toggleLike(id: number, customerId:number){
+    const merchandiseId = id;
+    const like = await this.prismaService.merchandiseLikes.findUnique({
+      where: {merchandiseId_customerId: {customerId,merchandiseId}},
+    });
+
+    const message = like ? '영양제 좋아요 취소 완료' : '영양제 좋아요 완료';
+
+    const updateLike = like
+      ? await this.prismaService.merchandiseLikes.delete({
+        where: {merchandiseId_customerId: {customerId,merchandiseId}},
+      })
+      : await this.prismaService.merchandiseLikes.create({
+        data: {customerId, merchandiseId},
+      });
+
+      return {result: updateLike, message}
+  }
 }
