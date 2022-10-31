@@ -112,7 +112,7 @@ model Merchandise {
   Image                     Image?
   MerchandiseEffect         MerchandiseEffect[]
   MerchandiseLikes          MerchandiseLikes[]
-  Posting                   Posting[]
+  Posting                    Posting[]
 }
 
 model MerchandiseHowToConsume {
@@ -140,7 +140,7 @@ model MerchandiseLikes {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   customer      Customer    @relation(fields: [customerId], references: [id])
-  merchandse    Merchandise @relation(fields: [merchandiseId], references: [id])
+  merchandise    Merchandise @relation(fields: [merchandiseId], references: [id])
 
   @@unique([merchandiseId, customerId])
 }

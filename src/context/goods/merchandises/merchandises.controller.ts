@@ -12,7 +12,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Pharmacist as TPharmacist, Prisma } from '@prisma/client';
+import {
+  Pharmacist as TPharmacist,
+  Customer as TCustomer,
+  Prisma,
+} from '@prisma/client';
 import { ROLE } from 'src/constant/account.constant';
 import { Roles } from 'src/decorators/roles.decorator';
 import { TransformMerchandisesCreateMerchandiseRequestDtoPipe } from './merchandises.pipe';
@@ -21,8 +25,10 @@ import {
   Comment,
   PatchCommentDto,
   CreateMerchandiseFromCrawlerDto,
+  GetMerchandisesByLikesFilteringAgeDto,
 } from './dto/merchandise.dto';
 import { Pharmacist } from 'src/decorators/pharmacist.decorator';
+import { Customer } from 'src/decorators/customer.decorator';
 
 @Controller('goods/merchandises')
 export class MerchandisesController {
@@ -114,17 +120,27 @@ export class MerchandisesController {
     );
   }
 
-  @Get(':merchandiseId')
+  @Get('/:merchandiseId')
   getMerchandise(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
     return this.merchandisesService.getMerchandise(merchandiseId);
   }
 
-  @Put(':id/like')
+  @Put('/:merchandiseId/like')
+  @Roles(ROLE.CUSTOMER)
   toggleLike(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('customerId') customerId: number,
+    @Param('merchandiseId', ParseIntPipe) merchandiseId: number,
+    @Customer() customer: TCustomer,
   ) {
-    return this.merchandisesService.toggleLike(id, customerId);
+    return this.merchandisesService.toggleLike(merchandiseId, customer);
   }
 
+  @Get('')
+  rankinggetMerchandisesByLikesFilteringAgeByAge(
+    @Body()
+    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
+  ) {
+    return this.merchandisesService.getMerchandisesByLikesFilteringAge(
+      getMerchandisesByLikesFilteringAgeDto,
+    );
+  }
 }

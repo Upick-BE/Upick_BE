@@ -4,13 +4,14 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Pharmacist, Prisma } from '@prisma/client';
+import { Pharmacist, Customer, Prisma } from '@prisma/client';
 import { ImagesService } from 'src/context/common/images/images.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   Comment,
   PatchCommentDto,
   CreateMerchandiseFromCrawlerDto,
+  GetMerchandisesByLikesFilteringAgeDto,
 } from './dto/merchandise.dto';
 
 @Injectable()
@@ -217,22 +218,63 @@ export class MerchandisesService {
     return { result: merchandise, message: '약 상세조회 완료' };
   }
 
-  async toggleLike(id: number, customerId:number){
+  async toggleLike(id: number, customer: Customer) {
     const merchandiseId = id;
     const like = await this.prismaService.merchandiseLikes.findUnique({
-      where: {merchandiseId_customerId: {customerId,merchandiseId}},
+      where: {
+        merchandiseId_customerId: { customerId: customer.id, merchandiseId },
+      },
     });
 
     const message = like ? '영양제 좋아요 취소 완료' : '영양제 좋아요 완료';
 
     const updateLike = like
       ? await this.prismaService.merchandiseLikes.delete({
-        where: {merchandiseId_customerId: {customerId,merchandiseId}},
-      })
+          where: {
+            merchandiseId_customerId: {
+              customerId: customer.id,
+              merchandiseId,
+            },
+          },
+        })
       : await this.prismaService.merchandiseLikes.create({
-        data: {customerId, merchandiseId},
-      });
+          data: { customerId: customer.id, merchandiseId },
+        });
 
-      return {result: updateLike, message}
+    return { result: updateLike, message };
+  }
+
+  async getMerchandisesByLikesFilteringAge(
+    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
+  ) {
+    const { minAge, maxAge } = getMerchandisesByLikesFilteringAgeDto;
+    const merchandises = await this.prismaService.merchandise.findMany({
+      where: {
+        MerchandiseLikes: {
+          some: { customer: { age: { gte: minAge, lte: maxAge } } },
+        },
+      },
+      include: {
+        MerchandiseLikes: { select: { customer: { select: { age: true } } } },
+      },
+    });
+
+    let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const count = merchandise.MerchandiseLikes.filter(
+        (e) => e.customer.age >= minAge && e.customer.age <= maxAge,
+      ).length;
+
+      const _merchandise = Object.assign(merchandise, { likes: count });
+      delete _merchandise.MerchandiseLikes;
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+    return {
+      result: _merchandises,
+      message: `${minAge}세 ~ ${maxAge}세 인기 상품`,
+    };
   }
 }

@@ -32,3 +32,8 @@ export interface CreateMerchandiseFromCrawlerDto {
   merchandiseHowToConsume: string;
   merchandiseEffects: string[];
 }
+
+export interface GetMerchandisesByLikesFilteringAgeDto {
+  minAge: number;
+  maxAge: number;
+}
