@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Pharmacist, Customer, Prisma } from '@prisma/client';
+import { Pharmacist, Customer, Prisma, Gender } from '@prisma/client';
 import { ImagesService } from 'src/context/common/images/images.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
@@ -262,7 +262,9 @@ export class MerchandisesService {
     let _merchandises = [];
     for (const merchandise of merchandises) {
       const count = merchandise.MerchandiseLikes.filter(
-        (e) => e.customer.age >= minAge && e.customer.age <= maxAge,
+        (MerchandiseLike) =>
+          MerchandiseLike.customer.age >= minAge &&
+          MerchandiseLike.customer.age <= maxAge,
       ).length;
 
       const _merchandise = Object.assign(merchandise, { likes: count });
@@ -301,5 +303,119 @@ export class MerchandisesService {
     });
 
     return { result: merchandises, message: `'${keyword}' 로 검색 완료~!` };
+  }
+  async getMerchandisesByLikesFilteringGender(gender: Gender) {
+    const merchandises = await this.prismaService.merchandise.findMany({
+      where: {
+        MerchandiseLikes: {
+          some: {
+            customer: {
+              gender,
+            },
+          },
+        },
+      },
+      include: {
+        MerchandiseLikes: {
+          select: { customer: { select: { gender: true, } } },
+        },
+      },
+    });
+
+    let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const merchanGenders = merchandise.MerchandiseLikes.filter(
+        (MerchandiseLike) => MerchandiseLike.customer.gender === gender,
+      ).length;
+
+      const _merchandise = Object.assign(merchandise, {
+        likes : merchanGenders
+      });
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+    return {
+      result: _merchandises,
+      message: '성별 좋아요 순위',
+    };
+  }
+
+  async getMerchandisesByLikesFilteringEffect(tagId: number) {
+    const merchandises = await this.prismaService.merchandise.findMany({
+      where: {
+        MerchandiseEffect: {
+          some: {
+            tagId: tagId,
+          },
+        },
+      },
+      include: {
+        MerchandiseLikes: {
+          select: {
+            merchandise: {
+              select: {
+                MerchandiseLikes: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const count = merchandise.MerchandiseLikes.filter(
+        (e) => e.merchandise.MerchandiseLikes,
+      ).length;
+      const _merchandise = Object.assign(merchandise, { likes: count });
+      delete _merchandise.MerchandiseLikes;
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+    return {
+      result: _merchandises,
+      message: '효과 별 좋아요 순위',
+    };
+  }
+
+  async serchingCategoryInMerchandise(textTyping:string){
+    const merchandise = await this.prismaService.merchandise.findMany({
+      where: {
+        OR: [
+          {
+            name:{
+              contains: textTyping
+            },
+          },
+          {
+            MerchandiseEffect:{
+              some:{
+                tag: {
+                  name:{
+                    contains:textTyping
+                  }
+                }
+              }
+            }
+          },
+          {
+            company:{
+              name:{
+                contains: textTyping
+              }
+            }
+          }
+        ],
+      },
+      include: {
+        
+      }
+    })
+
+    return
   }
 }

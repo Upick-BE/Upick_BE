@@ -13,18 +13,18 @@ model Customer {
   password         String?
   age              Int?
   activity         String?
-  gender           String?
+  gender           Gender?
   nickname         String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   providerId       String?
   provider         Provider
+  CustomerToTag    CustomerToTag[]
+  Disease          Disease[]
   MerchandiseLikes MerchandiseLikes[]
   PharmacistLikes  PharmacistLikes[]
   postingLikes     PostingLikes[]
-  Disease          Disease[]
   TakingMedicine   TakingMedicine[]
-  CustomerToTag    CustomerToTag[]
 
   @@unique([provider, providerId])
 }
@@ -35,6 +35,11 @@ model Disease {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   customer   Customer @relation(fields: [customerId], references: [id])
+}
+
+enum Gender {
+  male
+  female
 }
 
 model Pharmacist {
@@ -83,9 +88,9 @@ model Tag {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   name              String
+  CustomerToTag     CustomerToTag[]
   MerchandiseEffect MerchandiseEffect[]
   PostingToTag      PostingToTag[]
-  CustomerToTag     CustomerToTag[]
 }
 
 model CustomerToTag {
@@ -201,19 +206,19 @@ model Comment {
   Pharmacist    Pharmacist  @relation(fields: [pharmacistId], references: [id])
 }
 
-enum Provider {
-  local
-  kakao
-}
-
 model TakingMedicine {
   id            Int         @id @default(autoincrement())
   customerId    Int
   merchandiseId Int
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  merchandise   Merchandise @relation(fields: [merchandiseId], references: [id])
   customer      Customer    @relation(fields: [customerId], references: [id])
+  merchandise   Merchandise @relation(fields: [merchandiseId], references: [id])
 
   @@unique([merchandiseId, customerId])
+}
+
+enum Provider {
+  local
+  kakao
 }

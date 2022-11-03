@@ -16,6 +16,7 @@ import {
   Pharmacist as TPharmacist,
   Customer as TCustomer,
   Prisma,
+  Gender,
 } from '@prisma/client';
 import { ROLE } from 'src/constant/account.constant';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -34,6 +35,15 @@ import { Customer } from 'src/decorators/customer.decorator';
 export class MerchandisesController {
   constructor(private readonly merchandisesService: MerchandisesService) {}
 
+  @Get('filtering-by-effect/:tagId')
+  rankinggetMerchandisesByLikesFilteringByEffect(
+    @Param('tagId', ParseIntPipe) tagId: number,
+  ) {
+    return this.merchandisesService.getMerchandisesByLikesFilteringEffect(
+      tagId,
+    );
+  }
+
   @Post()
   @Roles(ROLE.PHARMACIST)
   @UseInterceptors(FileInterceptor('imageToUpload'))
@@ -49,15 +59,24 @@ export class MerchandisesController {
     );
   }
 
-  @Post('/:merchandiseId/effects')
-  @Roles(ROLE.PHARMACIST)
-  createMerchandiseEffects(
-    @Param('merchandiseId', ParseIntPipe) merchandiseId: number,
-    @Body('effects') effects: string[],
+  @Get('filtering-by-gender/:gender')
+  rankinggetMerchandisesByLikesFilteringByGender(
+    @Param('gender')
+    gender: Gender,
   ) {
-    return this.merchandisesService.createMerchandiseEffects(
-      merchandiseId,
-      effects,
+    console.log(gender);
+    return this.merchandisesService.getMerchandisesByLikesFilteringGender(
+      gender,
+    );
+  }
+
+  @Get('Filtering-by-Age')
+  rankinggetMerchandisesByLikesFilteringAgeByAge(
+    @Body()
+    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
+  ) {
+    return this.merchandisesService.getMerchandisesByLikesFilteringAge(
+      getMerchandisesByLikesFilteringAgeDto,
     );
   }
 
@@ -69,6 +88,17 @@ export class MerchandisesController {
     return this.merchandisesService.createMerchandiseFromCrawler(
       createMerchandiseFromCrawlerDto,
     );
+  }
+
+  // @Get('/:merchandiseId/comments')
+  // getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
+  //   return this.merchandisesService.getComments(merchandiseId);
+  // }
+
+  @Get('/search/category')
+  @Roles(ROLE.CUSTOMER)
+  serchingCategoryInMerchandise(@Param('textTyping', ParseIntPipe) textTyping: string) {
+    return this.merchandisesService.serchingCategoryInMerchandise(textTyping,);
   }
 
   @Post('/:merchandiseId/comments')
@@ -84,11 +114,6 @@ export class MerchandisesController {
       pharmacist,
     );
   }
-
-  // @Get('/:merchandiseId/comments')
-  // getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
-  //   return this.merchandisesService.getComments(merchandiseId);
-  // }
 
   @Patch('/:merchandiseId/comments/:commentId')
   @Roles(ROLE.PHARMACIST)
@@ -129,15 +154,7 @@ export class MerchandisesController {
     return this.merchandisesService.toggleLike(merchandiseId, customer);
   }
 
-  @Get('')
-  rankinggetMerchandisesByLikesFilteringAgeByAge(
-    @Body()
-    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
-  ) {
-    return this.merchandisesService.getMerchandisesByLikesFilteringAge(
-      getMerchandisesByLikesFilteringAgeDto,
-    );
-  }
+
 
   @Get('search/:keyword')
   @Roles(ROLE.CUSTOMER)

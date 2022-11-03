@@ -10,10 +10,10 @@ import * as bcrypt from 'bcrypt';
 import { JwtPayload, sign } from 'jsonwebtoken';
 import * as qs from 'qs';
 import axios from 'axios';
-import { Provider, Customer } from '@prisma/client';
+import { Provider, Customer, Gender } from '@prisma/client';
 @Injectable()
 export class CustomersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) {}  
 
   async customerSignup(customer: Customer, customerSignUpSecret: string) {
     const { email, password, nickname, age, gender } = customer;
@@ -35,7 +35,7 @@ export class CustomersService {
         nickname,
         provider: Provider.local,
         age,
-        gender,
+      
         //TODO 성현 : age 랑 gender 는 원래는 필수값이 아니지만 지금은 유저정보 변경 api 가 없어서
         //      우선 필수값으로 넣겠습니다. 추후 회원정보 변경 api 만들시 원래대로 돌려놓겟습니다
       },
