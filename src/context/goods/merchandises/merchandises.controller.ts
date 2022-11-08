@@ -10,6 +10,7 @@ import {
   Patch,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -17,6 +18,7 @@ import {
   Customer as TCustomer,
   Prisma,
   Gender,
+  Consider,
 } from '@prisma/client';
 import { ROLE } from 'src/constant/account.constant';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -34,12 +36,18 @@ import { Customer } from 'src/decorators/customer.decorator';
 export class MerchandisesController {
   constructor(private readonly merchandisesService: MerchandisesService) {}
 
-  @Get('filtering-by-effect/:effectId')
+  @Get('recently-read-merchandise')
+  @Roles(ROLE.CUSTOMER)
+  getrecentlyReadMerchandise(){
+    return this.merchandisesService.getrecentlyReadMerchandise();
+  }
+
+  @Get('filtering-by-effect')
   rankinggetMerchandisesByLikesFilteringByEffect(
-    @Param('effectId', ParseIntPipe) effectId: number,
+    @Query('keyword') keyword?: string,
   ) {
     return this.merchandisesService.getMerchandisesByLikesFilteringEffect(
-      effectId,
+      keyword,
     );
   }
 
@@ -62,23 +70,40 @@ export class MerchandisesController {
   }
 
   @Get('filtering-by-gender/:gender')
+  @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringByGender(
     @Param('gender')
     gender: Gender,
+    @Query('keyword') keyword?: string,
   ) {
-    console.log(gender);
     return this.merchandisesService.getMerchandisesByLikesFilteringGender(
       gender,
+      keyword,
     );
   }
 
-  @Get('Filtering-by-Age')
+  @Get('filtering-by-Age/:minAge/:maxAge')
+  @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringAgeByAge(
-    @Body()
-    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
+    @Param()
+    minAge: number,
+    maxAge: number,
+    @Query('keyword')
+    keyword?: string,
   ) {
     return this.merchandisesService.getMerchandisesByLikesFilteringAge(
-      getMerchandisesByLikesFilteringAgeDto,
+      minAge,
+      maxAge,keyword
+    );
+  }
+
+  @Get('filtering-by-consider')
+  @Roles(ROLE.CUSTOMER)
+  rankinggetMerchandisesByLikesFilteringAgeByConsider(
+    @Query('keyword') keyword: string,
+  ) {
+    return this.merchandisesService.rankinggetMerchandisesByLikesFilteringAgeByConsider(
+      keyword,
     );
   }
 
@@ -86,12 +111,6 @@ export class MerchandisesController {
   // getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
   //   return this.merchandisesService.getComments(merchandiseId);
   // }
-
-  @Get('/search/category')
-  @Roles(ROLE.CUSTOMER)
-  serchingCategoryInMerchandise(@Param('keyword') keyword: string) {
-    return this.merchandisesService.serchingCategoryInMerchandise(keyword);
-  }
 
   @Post('/:merchandiseId/comments')
   @Roles(ROLE.PHARMACIST)
@@ -148,8 +167,8 @@ export class MerchandisesController {
 
   @Get('search/:keyword')
   @Roles(ROLE.CUSTOMER)
-  searchMerchandise(@Param('keyword') keyword: string) {
-    return this.merchandisesService.searchMerchandise(keyword);
+  getMerchandisesOrderByLikeCounts(@Param('keyword') keyword: string) {
+    return this.merchandisesService.getMerchandisesOrderByLikeCounts(keyword);
   }
 
   @Get('/:merchandiseId')

@@ -308,11 +308,19 @@ export class MerchandisesService {
   }
 
   async getMerchandisesByLikesFilteringAge(
-    getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
+    minAge: number,
+    maxAge: number,
+    keyword?: string,
   ) {
-    const { minAge, maxAge } = getMerchandisesByLikesFilteringAgeDto;
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
+        OR:[
+          {
+            name:{
+              contains:keyword
+            }
+          }
+        ],
         MerchandiseLikes: {
           some: { customer: { age: { gte: minAge, lte: maxAge } } },
         },
@@ -343,7 +351,7 @@ export class MerchandisesService {
     };
   }
 
-  async searchMerchandise(keyword: string) {
+  async getMerchandisesOrderByLikeCounts(keyword: string) {
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
         OR: [
@@ -365,21 +373,55 @@ export class MerchandisesService {
       include: {
         MerchandiseEffect: { select: { effect: { select: { name: true } } } },
         company: { select: { name: true } },
-      },
-    });
-
-    return { result: merchandises, message: `'${keyword}' 로 검색 완료~!` };
-  }
-  async getMerchandisesByLikesFilteringGender(gender: Gender) {
-    const merchandises = await this.prismaService.merchandise.findMany({
-      where: {
         MerchandiseLikes: {
-          some: {
-            customer: {
-              gender,
+          select: {
+            merchandise: {
+              select: {
+                MerchandiseLikes: true,
+              },
             },
           },
         },
+      },
+    });
+
+    let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const count = merchandise.MerchandiseLikes.filter(
+        (e) => e.merchandise.MerchandiseLikes,
+      ).length;
+      const _merchandise = Object.assign(merchandise, { likes: count });
+      delete _merchandise.MerchandiseLikes;
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+    return { result: _merchandises, message: `'${keyword}' 로 검색 완료~!` };
+  }
+
+  async getMerchandisesByLikesFilteringGender(
+    gender: Gender,
+    keyword?: string,
+  ) {
+    const merchandises = await this.prismaService.merchandise.findMany({
+      where: {
+        AND: [
+          {
+            name: {
+              contains: keyword,
+            },
+          },
+          {
+            MerchandiseLikes: {
+              some: {
+                customer: {
+                  gender,
+                },
+              },
+            },
+          },
+        ],
       },
       include: {
         MerchandiseLikes: {
@@ -403,19 +445,27 @@ export class MerchandisesService {
     _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
 
     return {
-      result: _merchandises,
+      result: merchandises,
       message: '성별 좋아요 순위',
     };
   }
 
-  async getMerchandisesByLikesFilteringEffect(effectId: number) {
+  async getMerchandisesByLikesFilteringEffect(keyword?: string) {
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
-        MerchandiseEffect: {
-          some: {
-            effectId,
+        AND: [
+          {
+            MerchandiseEffect: {
+              some: {
+                effect: {
+                  name: {
+                    contains: keyword,
+                  },
+                },
+              },
+            },
           },
-        },
+        ],
       },
       include: {
         MerchandiseLikes: {
@@ -444,12 +494,12 @@ export class MerchandisesService {
 
     return {
       result: _merchandises,
-      message: '효과 별 좋아요 순위',
+      message: '효과 별 좋아요 순위 조회 완료!',
     };
   }
 
-  async serchingCategoryInMerchandise(keyword: string) {
-    const merchandise = await this.prismaService.merchandise.findMany({
+  async rankinggetMerchandisesByLikesFilteringAgeByConsider(keyword) {
+    const merchandises = await this.prismaService.merchandise.findMany({
       where: {
         OR: [
           {
@@ -460,28 +510,148 @@ export class MerchandisesService {
           {
             MerchandiseEffect: {
               some: {
-                effect: {
-                  name: {
-                    contains: keyword,
+                merchandise: {
+                  MerchandiseEffect: {
+                    some: {
+                      effect: {
+                        name: {
+                          contains: keyword,
+                        },
+                      },
+                    },
                   },
                 },
               },
             },
           },
-          {
-            company: {
-              name: {
-                contains: keyword,
+        ],
+      },
+      include: {
+        MerchandiseLikes: {
+          select: {
+            merchandise: {
+              select: {
+                MerchandiseLikes: true,
               },
             },
           },
-        ],
+        },
       },
-      include: {},
     });
 
-    return;
+    let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const count = merchandise.MerchandiseLikes.filter(
+        (e) => e.merchandise.MerchandiseLikes,
+      ).length;
+      const _merchandise = Object.assign(merchandise, { likes: count });
+      delete _merchandise.MerchandiseLikes;
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+    return { result: _merchandises, message: '건강고민별 조회 완료!' };
   }
+  
+
+  async getrecentlyReadMerchandise(){
+    const randomNumberFirst = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+    const randomNumbersecond = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+    const randomNumberthird = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+    const randomNumberFour = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+    const merchandiseFirst = await this.prismaService.merchandise.findMany({
+      where:{
+        id:randomNumberFirst
+      },
+      include:{
+        MerchandiseEffect:{
+          select:{
+            merchandise:{
+              select:{
+                name:true
+              }
+            }
+          }
+        },
+        Image:{
+          select:{
+            id:true
+          }
+        },
+        company:true
+      }     
+    })
+    const merchandiseSecond = await this.prismaService.merchandise.findMany({
+      where:{
+        id:randomNumbersecond
+      },
+      include:{
+        MerchandiseEffect:{
+          select:{
+            merchandise:{
+              select:{
+                name:true
+              }
+            }
+          }
+        },
+        Image:{
+          select:{
+            id:true
+          }
+        },
+        company:true
+      }     
+    })
+    const merchandiseThird = await this.prismaService.merchandise.findMany({
+      where:{
+        id:randomNumberthird
+      },
+      include:{
+        MerchandiseEffect:{
+          select:{
+            merchandise:{
+              select:{
+                name:true
+              }
+            }
+          }
+        },
+        Image:{
+          select:{
+            id:true
+          }
+        },
+        company:true
+      }     
+    })
+    const merchandiseFour = await this.prismaService.merchandise.findMany({
+      where:{
+        id:randomNumberFour
+      },
+      include:{
+        MerchandiseEffect:{
+          select:{
+            merchandise:{
+              select:{
+                name:true
+              }
+            }
+          }
+        },
+        Image:{
+          select:{
+            id:true
+          }
+        },
+        company:true
+      }     
+    })
+    
+    return {result: {merchandiseFirst,merchandiseSecond,merchandiseThird,merchandiseFour}, message : "최근 조회한 영양제 리스트 조회 완료! (랜덤 영양제)"}
+  }
+
   async addMerchandiseToPickUpList(merchandiseId: number, customer: Customer) {
     const randomNumber = Math.round(Math.random() + 1);
     const randomPharmacist = await this.prismaService.pharmacist.findUnique({
