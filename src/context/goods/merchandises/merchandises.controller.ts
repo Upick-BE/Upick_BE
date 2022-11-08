@@ -35,6 +35,7 @@ export class MerchandisesController {
   constructor(private readonly merchandisesService: MerchandisesService) {}
 
   @Get('filtering-by-effect/:effectId')
+  @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringByEffect(
     @Param('effectId', ParseIntPipe) effectId: number,
   ) {
@@ -62,6 +63,7 @@ export class MerchandisesController {
   }
 
   @Get('filtering-by-gender/:gender')
+  @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringByGender(
     @Param('gender')
     gender: Gender,
@@ -73,8 +75,9 @@ export class MerchandisesController {
   }
 
   @Get('Filtering-by-Age')
+  @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringAgeByAge(
-    @Body()
+    @Param()
     getMerchandisesByLikesFilteringAgeDto: GetMerchandisesByLikesFilteringAgeDto,
   ) {
     return this.merchandisesService.getMerchandisesByLikesFilteringAge(
@@ -151,9 +154,22 @@ export class MerchandisesController {
   searchMerchandise(@Param('keyword') keyword: string) {
     return this.merchandisesService.searchMerchandise(keyword);
   }
+  @Get('allMerchandise-home')
+  getAllMerchandise(){
+    return this.merchandisesService.getAllMerchandise();
+  }
 
   @Get('/:merchandiseId')
+  @Roles(ROLE.CUSTOMER)
   getMerchandise(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
     return this.merchandisesService.getMerchandise(merchandiseId);
   }
+
+  @Get('recently-read-merchandise')
+  getrecentlyReadMerchandise(){
+    return this.merchandisesService.getrecentlyReadMerchandise();
+  }
+
+
+  
 }

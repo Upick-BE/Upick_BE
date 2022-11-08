@@ -95,4 +95,20 @@ export class PharmacistsService {
 
     return { result: token, message: 'Login success' };
   }
+  async getHomeTownPharmacists() {
+    const getHomeTownPharmacists = await this.prismaService.pharmacist.findMany(
+      {
+        select: {
+          userName: true,
+          pharmacyName: true,
+          Image: { select: { url: true } },
+        },
+      },
+    );
+    return {
+      result: getHomeTownPharmacists,
+      message: '우리동네 약사 조회 완료!',
+    };
+    // {result: pharmacist, message: "우리동네 약사 조회 완료"}
+  }
 }

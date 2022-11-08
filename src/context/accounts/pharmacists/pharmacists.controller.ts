@@ -4,6 +4,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SignInDto, PharmacistSignUpDto } from './dto/pharmacist.dto';
@@ -26,5 +27,11 @@ export class PharmacistsController {
   @Post('sign-in')
   signIn(@Body() signInDto: SignInDto) {
     return this.pharmacistsService.signIn(signInDto);
+  }
+
+  @Get('hometown-pharmacists')
+  // @Roles(ROLE.CUSTOMER)
+  getHomeTownPharmacists() {
+    return this.pharmacistsService.getHomeTownPharmacists();
   }
 }

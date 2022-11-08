@@ -483,4 +483,45 @@ export class MerchandisesService {
 
     return;
   }
+  async getrecentlyReadMerchandise() {
+    const randomNumber = Math.floor(Math.random() * 1000);
+
+    const selectArg = {
+      select: { id: true, name: true, image: true, company: true },
+    };
+    const merchandise = {
+      merchandises: await this.prismaService.merchandise.findMany(selectArg),
+    };
+
+    return { result: merchandise, message: '최근 봤던 영양제(랜덤) 조회 완료' };
+  }
+
+  async getAllMerchandise() {
+    const merchandises = await this.prismaService.merchandise.findMany({
+      select: {
+        id: true,
+        name: true,
+        company: { select: { name: true } },
+        Image: { select: { url: true } },
+        MerchandiseEffect: { select: { effect: { select: { name: true } } } },
+        MerchandiseLikes: {select:{id:true}}
+      }
+    });
+
+     let _merchandises = [];
+    for (const merchandise of merchandises) {
+      const count = merchandise.MerchandiseLikes.filter(
+        (e) => e
+      ).length;
+      const _merchandise = Object.assign(merchandise, { likes: count });
+      delete _merchandise.MerchandiseLikes;
+
+      _merchandises.push(_merchandise);
+    }
+    _merchandises = _merchandises.sort((a, b) => b.likes - a.likes);
+
+
+    return {result : _merchandises, message: "모든 영양제 인기순 조회 완료"};
+  }
+
 }
