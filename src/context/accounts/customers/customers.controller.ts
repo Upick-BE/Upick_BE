@@ -1,3 +1,4 @@
+import { COOKIE_DOMAIN } from './../../../constant/config.constant';
 import {
   Body,
   Controller,
@@ -8,6 +9,7 @@ import {
   Delete,
   Get,
   Query,
+  Res,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import {
@@ -24,6 +26,7 @@ import {
 import { Roles } from 'src/decorators/roles.decorator';
 import { ROLE } from 'src/constant/account.constant';
 import { Pharmacist } from 'src/decorators/pharmacist.decorator';
+import { Response } from 'express';
 
 @Controller('customers')
 export class CustomersController {
@@ -35,13 +38,34 @@ export class CustomersController {
   }
 
   @Post('sign-in')
-  customerSignIn(@Body() signInDto: SignInDto) {
-    return this.customersService.customerSignIn(signInDto);
+  async customerSignIn(
+    @Res({ passthrough: true }) response: Response,
+    @Body() signInDto: SignInDto,
+  ) {
+    const { result } = await this.customersService.customerSignIn(signInDto);
+    response.cookie('accessToken', result, { domain: COOKIE_DOMAIN });
+
+    return { result };
   }
 
   @Post('sign-in/kakao')
-  signInKakao(@Body() signInKakaoRequestDto: SignInKakaoRequestDto) {
-    return this.customersService.signInKakao(signInKakaoRequestDto);
+  async signInKakao(
+    @Res({ passthrough: true }) response: Response,
+    @Body('code') code: string,
+    @Body('redirectUri') redirectUri: string,
+  ) {
+    const signInKakaoRequestDto: SignInKakaoRequestDto = {
+      code,
+      redirectUri,
+    };
+
+    const { result } = await this.customersService.signInKakao(
+      signInKakaoRequestDto,
+    );
+
+    response.cookie('accessToken', result, { domain: COOKIE_DOMAIN });
+
+    return { result };
   }
 
   @Get('my-pick/taking-medicine')
