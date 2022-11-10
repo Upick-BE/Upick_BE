@@ -314,7 +314,7 @@ export class MerchandisesService {
   ) {
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
-        OR: [
+        AND: [
           {
             name: {
               contains: keyword,
@@ -327,6 +327,8 @@ export class MerchandisesService {
       },
       include: {
         MerchandiseLikes: { select: { customer: { select: { age: true } } } },
+        Image: { select: { url: true } },
+        MerchandiseEffect: { select: { effect: { select: { name: true } } } },
       },
     });
 
@@ -509,7 +511,7 @@ export class MerchandisesService {
     };
   }
 
-  async rankinggetMerchandisesByLikesFilteringAgeByConsider(keyword) {
+  async rankinggetMerchandisesByLikesFilteringByConsider(keyword) {
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
         OR: [
@@ -535,6 +537,21 @@ export class MerchandisesService {
               },
             },
           },
+          {
+            MerchandiseToPosting:{
+              some:{
+                posting:{
+                  PostingToConsider:{
+                    some:{
+                      consider:{
+                        name:keyword
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         ],
       },
       take: 10,

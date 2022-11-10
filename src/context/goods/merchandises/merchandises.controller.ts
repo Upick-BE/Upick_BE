@@ -82,12 +82,13 @@ export class MerchandisesController {
     );
   }
 
-  @Get('filtering-by-Age/:minAge/:maxAge')
+  @Get('filtering-by-Age')
   @Roles(ROLE.CUSTOMER)
   rankinggetMerchandisesByLikesFilteringAgeByAge(
-    @Param()
-    minAge: number,
-    maxAge: number,
+    @Query('minAge')
+    minAge?: number,
+    @Query('maxAge')
+    maxAge?: number,
     @Query('keyword')
     keyword?: string,
   ) {
@@ -102,7 +103,7 @@ export class MerchandisesController {
   rankinggetMerchandisesByLikesFilteringAgeByConsider(
     @Query('keyword') keyword: string,
   ) {
-    return this.merchandisesService.rankinggetMerchandisesByLikesFilteringAgeByConsider(
+    return this.merchandisesService.rankinggetMerchandisesByLikesFilteringByConsider(
       keyword,
     );
   }
