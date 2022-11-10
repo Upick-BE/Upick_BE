@@ -383,6 +383,7 @@ export class MerchandisesService {
             },
           },
         },
+        Image:{select:{url:true}},
       },
     });
 
@@ -429,6 +430,8 @@ export class MerchandisesService {
         MerchandiseLikes: {
           select: { customer: { select: { gender: true } } },
         },
+        Image: { select: { url: true } },
+        MerchandiseEffect: { select: { effect: { select: { name: true } } } },
       },
     });
 
@@ -455,7 +458,7 @@ export class MerchandisesService {
   async getMerchandisesByLikesFilteringEffect(keyword?: string) {
     const merchandises = await this.prismaService.merchandise.findMany({
       where: {
-        AND: [
+        OR: [
           {
             MerchandiseEffect: {
               some: {
@@ -466,6 +469,9 @@ export class MerchandisesService {
                 },
               },
             },
+          },
+          {
+            name: { contains: keyword },
           },
         ],
       },
@@ -480,6 +486,8 @@ export class MerchandisesService {
             },
           },
         },
+        Image: { select: { url: true } },
+        MerchandiseEffect: { select: { effect: { select: { name: true } } } },
       },
     });
 
@@ -540,7 +548,10 @@ export class MerchandisesService {
             },
           },
         },
+        Image: { select: { url: true } },
+        MerchandiseEffect:{select:{effect:{select:{name:true}}},
       },
+    }
     });
 
     let _merchandises = [];
@@ -568,21 +579,25 @@ export class MerchandisesService {
         id: { in: randomNumbers },
       },
       include: {
-        MerchandiseEffect: {
-          select: {
-            merchandise: {
-              select: {
-                name: true,
-              },
-            },
-          },
+        MerchandiseEffect:{
+          select:{
+            effect:{
+              select:{
+                name:true
+              }
+            }
+          }
         },
         Image: {
           select: {
-            id: true,
+            url:true
           },
         },
-        company: true,
+        company: {
+          select:{
+            name:true
+          }
+        }
       },
     });
 
