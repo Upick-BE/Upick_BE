@@ -329,6 +329,11 @@ export class MerchandisesService {
         MerchandiseLikes: { select: { customer: { select: { age: true } } } },
         Image: { select: { url: true } },
         MerchandiseEffect: { select: { effect: { select: { name: true } } } },
+        company: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -385,7 +390,7 @@ export class MerchandisesService {
             },
           },
         },
-        Image:{select:{url:true}},
+        Image: { select: { url: true } },
       },
     });
 
@@ -434,6 +439,11 @@ export class MerchandisesService {
         },
         Image: { select: { url: true } },
         MerchandiseEffect: { select: { effect: { select: { name: true } } } },
+        company: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -490,6 +500,11 @@ export class MerchandisesService {
         },
         Image: { select: { url: true } },
         MerchandiseEffect: { select: { effect: { select: { name: true } } } },
+        company: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -538,20 +553,20 @@ export class MerchandisesService {
             },
           },
           {
-            MerchandiseToPosting:{
-              some:{
-                posting:{
-                  PostingToConsider:{
-                    some:{
-                      consider:{
-                        name:keyword
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+            MerchandiseToPosting: {
+              some: {
+                posting: {
+                  PostingToConsider: {
+                    some: {
+                      consider: {
+                        name: keyword,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         ],
       },
       take: 10,
@@ -566,9 +581,11 @@ export class MerchandisesService {
           },
         },
         Image: { select: { url: true } },
-        MerchandiseEffect:{select:{effect:{select:{name:true}}},
+        MerchandiseEffect: { select: { effect: { select: { name: true } } } },
+        company: {
+          select: { name: true },
+        },
       },
-    }
     });
 
     let _merchandises = [];
@@ -596,25 +613,25 @@ export class MerchandisesService {
         id: { in: randomNumbers },
       },
       include: {
-        MerchandiseEffect:{
-          select:{
-            effect:{
-              select:{
-                name:true
-              }
-            }
-          }
+        MerchandiseEffect: {
+          select: {
+            effect: {
+              select: {
+                name: true,
+              },
+            },
+          },
         },
         Image: {
           select: {
-            url:true
+            url: true,
           },
         },
         company: {
-          select:{
-            name:true
-          }
-        }
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
