@@ -7,6 +7,7 @@ import {
   Put,
   Param,
   ParseIntPipe,
+  Get
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ROLE } from 'src/constant/account.constant';
@@ -43,5 +44,11 @@ export class PharmacistsController {
     @Customer() customer: TCustomer,
   ) {
     return this.pharmacistsService.toggleLikePharmacist(pharmacistId, customer);
+  }
+
+  @Get('homeTown-Pharmacist')
+  // @Roles(ROLE.CUSTOMER)
+  getAllMerchandise(){
+    return this.pharmacistsService.getAllMerchandise()
   }
 }

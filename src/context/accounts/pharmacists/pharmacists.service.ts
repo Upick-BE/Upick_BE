@@ -112,5 +112,29 @@ export class PharmacistsService {
         });
 
     return { result: updatedLike, message };
-  }
+   }
+
+   async getAllMerchandise(){
+    const pharmacist = await this.prismaService.pharmacist.findMany({
+      include:{
+        Image:{
+          select:{
+            url:true
+          }
+        },
+        PharmacistLikes:{
+          select:{
+            pharmacist:{
+              select:{
+                pharmacyName:true
+              }
+            }
+          }
+        },
+      }
+    })
+    return {
+      result:pharmacist, message : "우리동네 약사들 조회 완료!"
+    }
+   }
 }
