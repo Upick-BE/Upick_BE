@@ -47,7 +47,7 @@ export class PharmacistsController {
   }
 
   @Get('homeTown-Pharmacist')
-  // @Roles(ROLE.CUSTOMER)
+  @Roles(ROLE.CUSTOMER)
   getAllMerchandise(){
     return this.pharmacistsService.getAllMerchandise()
   }
