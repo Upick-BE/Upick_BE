@@ -115,26 +115,17 @@ export class PharmacistsService {
    }
 
    async getAllPharmacists(){
-    const pharmacist = await this.prismaService.pharmacist.findMany({
+    const pharmacists = await this.prismaService.pharmacist.findMany({
       include:{
         Image:{
           select:{
             url:true
           }
-        },
-        PharmacistLikes:{
-          select:{
-            pharmacist:{
-              select:{
-                pharmacyName:true
-              }
-            }
-          }
-        },
+        }
       }
     })
     return {
-      result:pharmacist, message : "우리동네 약사들 조회 완료!"
+      result:pharmacists, message : "우리동네 약사들 조회 완료!"
     }
    }
 }
