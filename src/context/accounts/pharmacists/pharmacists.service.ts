@@ -114,7 +114,7 @@ export class PharmacistsService {
     return { result: updatedLike, message };
    }
 
-   async getAllMerchandise(){
+   async getAllPharmacists(){
     const pharmacist = await this.prismaService.pharmacist.findMany({
       include:{
         Image:{

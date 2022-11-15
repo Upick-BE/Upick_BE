@@ -37,6 +37,12 @@ export class PharmacistsController {
     return this.pharmacistsService.signIn(signInDto);
   }
 
+  @Get('homeTown-pharmacist')
+  @Roles(ROLE.CUSTOMER)
+  getAllPharmacists(){
+    return this.pharmacistsService.getAllPharmacists()
+  }
+
   @Put('/:pharmacistId/like')
   @Roles(ROLE.CUSTOMER)
   toggleLikePharmacist(
@@ -46,9 +52,4 @@ export class PharmacistsController {
     return this.pharmacistsService.toggleLikePharmacist(pharmacistId, customer);
   }
 
-  @Get('homeTown-Pharmacist')
-  @Roles(ROLE.CUSTOMER)
-  getAllMerchandise(){
-    return this.pharmacistsService.getAllMerchandise()
-  }
 }
