@@ -37,6 +37,7 @@ export class PharmacistsController {
     return this.pharmacistsService.signIn(signInDto);
   }
 
+
   @Get('/')
   @Roles(ROLE.CUSTOMER)
   getAllPharmacists(){
