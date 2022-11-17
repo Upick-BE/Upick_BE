@@ -710,4 +710,24 @@ export class MerchandisesService {
 
     return { result: createdPickUp, message: '픽업 예약 완료' };
   }
+  
+  async getComments(merchandiseId:number){
+    const merchandiseComment = await this.prismaService.pharmacist.findUnique({
+      where:{
+        id:merchandiseId,
+      },
+      include:{
+        Comment:{
+          select:{
+            positive:true, negative:true
+          }
+        },
+      }
+    })
+    
+    return {
+      result:merchandiseComment, message: "영양제 댓글 조회 완료!"
+    }
+  }
+
 }
