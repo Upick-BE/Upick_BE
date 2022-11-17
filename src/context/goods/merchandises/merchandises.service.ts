@@ -267,7 +267,11 @@ export class MerchandisesService {
     const merchandise = await this.prismaService.merchandise.findUnique({
       where: { id: merchandiseId },
       include: {
-        Comment: true,
+        Comment: {
+          include:{
+            Pharmacist:true
+          }
+        },
         company: true,
         Image: { select: { url: true } },
         MerchandiseEffect: { select: { effect: { select: { name: true } } } },
