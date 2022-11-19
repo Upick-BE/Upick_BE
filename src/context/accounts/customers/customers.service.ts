@@ -87,8 +87,6 @@ export class CustomersService {
 
     console.log(kakaoToken);
 
-    console.log(kakaoToken);
-
     const kakaoIdUrl = 'https://kapi.kakao.com/v1/user/access_token_info';
     const kakaoIdOptions = {
       headers: { Authorization: `Bearer ${kakaoToken}` },
