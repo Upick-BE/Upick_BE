@@ -108,10 +108,10 @@ export class MerchandisesController {
     );
   }
 
-  // @Get('/:merchandiseId/comments')
-  // getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
-  //   return this.merchandisesService.getComments(merchandiseId);
-  // }
+  @Get('/:merchandiseId/comments')
+  getComments(@Param('merchandiseId', ParseIntPipe) merchandiseId: number) {
+    return this.merchandisesService.getComments(merchandiseId);
+  }
 
   @Post('/:merchandiseId/comments')
   @Roles(ROLE.PHARMACIST)
