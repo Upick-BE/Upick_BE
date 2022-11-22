@@ -59,24 +59,18 @@ export class CustomersService {
     return { result: token, message: '로그인 완료' };
   }
 
-  async signInKakao(_code: string) {
+  async signInKakao(code: string) {
     const redirectUri = process.env.REDIRECT_URI;
+    const client_id = process.env.CLIENT_ID;
 
-    if (!_code || !redirectUri) throw new Error('?');
-    const kakaoTokenUrl = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=0ff7b4e882fe18cced888f1439ca41e2&redirect_uri=${redirectUri}&code=${_code}`;
-    // const data = qs.stringify({
-    //   grant_type: 'authorization_code',
-    //   client_id: '0ff7b4e882fe18cced888f1439ca41e2',
-    //   redirect_uri: redirectUri,
-    //   code: _code,
-    // });
+    if (!code || !redirectUri) throw new Error('?');
+    const kakaoTokenUrl = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${client_id}&redirect_uri=${redirectUri}&code=${code}`;
+
     const kakaoTokenOptions = {
       headers: {
         'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
       },
     };
-
-    // console.log(kakaoTokenUrl, data, kakaoTokenOptions);
 
     const kakaoToken = await axios
       .post(kakaoTokenUrl, {}, kakaoTokenOptions)
